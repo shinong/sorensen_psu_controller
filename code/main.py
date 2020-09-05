@@ -10,12 +10,12 @@ import threading
 
 
 class Psu():
-    def __init__(self, port= None, Q_set= 20):
+    def __init__(self, port= None):
         if port:
             print("the port is" + port)
             self.port = port
-            self.Q_set = Q_set
             self.status_log_check()
+            self.load_config()
             self.serial_connection_start()
             self.psu_init()
             self.mqtt_config()
@@ -34,6 +34,17 @@ class Psu():
         result = self.sio.readline()
         print(result)
 
+    def load_config(self):
+        f = open("config.txt","r")
+        config = f.read().splitlines()
+        self.Amp_set = float(config[0].split(":")[1])
+        self.Q_set = float(config[1].split(":")[1])
+        self.broker_address = config[2].split(":")[1]
+        self.mqtt_username = config[3].split(":")[1]
+        self.mqtt_password = config[4].split(":")[1]
+        f.close()
+
+
     def serial_connection_stop(self):
         print("I am tryting to stop")
         self.sio.write(":OUTP:STAT OFF\n")
@@ -44,11 +55,10 @@ class Psu():
         self.record_file.close()
 
     def mqtt_config(self):
-        broker_address = "shinong.ddns.net"
         self.client = mqtt.Client("pow_server")
-        self.client.username_pw_set("shinong_laptop_server",password="19921023")
+        self.client.username_pw_set(self.mqtt_username,password=self.mqtt_password)
         self.client.on_log = self.on_log
-        self.client.connect(broker_address,keepalive=60)
+        self.client.connect(self.broker_address,keepalive=60)
         self.client.loop_start()
     
     def mqtt_stop(self):
@@ -76,7 +86,7 @@ class Psu():
          return self.sio.readline()
 
     def running(self):
-        self.sio.write(":SOUR:CURR 0.2\n")
+        self.sio.write(":SOUR:CURR {}\n".format(self.Amp_set))
         time.sleep(0.1)
         self.sio.write(":OUTP:STAT ON\n")
         self.record_file = open("record.txt","w")
@@ -96,7 +106,7 @@ class Psu():
             self.Q_factor += curr_num*(end-start)/3600
             print(self.Q_factor)
             start = time.time()
-            self.client.publish("lab/pow","voltage:{},current:{},ampHour:{}".format(self.volt,self.curr,self.Q_factor))
+            self.client.publish("shinongmao@gmail.com/lab/pow","voltage:{},current:{},ampHour:{}".format(self.volt,self.curr,self.Q_factor))
             self.record_file.seek(0)
             self.record_file.truncate()
             self.record_file.write(str(self.Q_factor))
