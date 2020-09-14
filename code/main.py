@@ -7,6 +7,7 @@ import os
 import tkinter as tk
 from tkinter import ttk
 import threading
+import json
 
 
 class Psu():
@@ -22,6 +23,7 @@ class Psu():
             self.running_status = False
             self.curr = "0.00"
             self.volt = "0.00"
+            self.message = {"current":0, "voltage":0, "amphour":0}
         else:
             print("please define a serial port first")
 
@@ -43,7 +45,6 @@ class Psu():
         self.mqtt_username = config[3].split(":")[1]
         self.mqtt_password = config[4].split(":")[1]
         f.close()
-
 
     def serial_connection_stop(self):
         print("I am tryting to stop")
@@ -91,7 +92,7 @@ class Psu():
         self.sio.write(":OUTP:STAT ON\n")
         self.record_file = open("record.txt","w")
         start = time.time()
-        while (self.Q_factor <= self.Q_set):
+        while (True):
             self.curr = self.data_fetch(":MEAS:CURR?\n")
             time.sleep(0.1)
             self.volt = self.data_fetch(":MEAS:VOLT?\n")
@@ -106,16 +107,22 @@ class Psu():
             self.Q_factor += curr_num*(end-start)/3600
             print(self.Q_factor)
             start = time.time()
-            self.client.publish("shinongmao@gmail.com/lab/pow","voltage:{},current:{},ampHour:{}".format(self.volt,self.curr,self.Q_factor))
+            self.message["voltage"] = self.volt
+            self.message["current"] = self.curr
+            self.message["amphour"] = self.Q_factor
+            #self.client.publish("shinongmao@gmail.com/lab/pow","voltage:{},current:{},ampHour:{}".format(self.volt,self.curr,self.Q_factor))
+            self.client.publish("shinongmao@gmail.com/lab/pow",json.dumps(self.message))
             self.record_file.seek(0)
             self.record_file.truncate()
             self.record_file.write(str(self.Q_factor))
             self.record_file.flush()
             os.fsync(self.record_file.fileno())
-            if not self.running_status:
+            if (not self.running_status) and (self.Q_factor <= self.Q_set):
                 self.serial_connection_stop()
                 self.mqtt_stop()
                 break
+
+
 class App(tk.Frame):
     def __init__(self, master):
         super().__init__(master)
