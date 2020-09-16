@@ -115,7 +115,7 @@ class Psu():
             self.record_file.write(str(self.Q_factor))
             self.record_file.flush()
             os.fsync(self.record_file.fileno())
-            if (not self.running_status) and (self.Q_factor <= self.Q_set):
+            if (not self.running_status) or (self.Q_factor > self.Q_set):
                 self.serial_connection_stop()
                 self.mqtt_stop()
                 break
