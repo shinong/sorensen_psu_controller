@@ -133,22 +133,23 @@ class App(tk.Frame):
     def create_widgets(self):
         #buttons
         self.start_button = tk.Button(self, text= "Start", bg= "green", command= lambda:threading.Thread(target=self.start_command).start())
-        self.start_button.pack()
+        self.start_button.grid(row = 5, column = 2)
         self.stop_button = tk.Button(self, text= "Force Stop", bg= "red", command= self.stop_command)
-        self.stop_button.pack()
+        self.stop_button.grid(row = 6, column = 2)
         #combobox
         self.port_select = ttk.Combobox(self,values= self.comport_list)
         self.port_select.current(0)
-        self.port_select.pack()
+        self.port_select.grid(row = 4, column = 2)
         #labels
         self.voltage_label = tk.Label(self,text = "0.00")
-        self.voltage_label.pack()
+        self.voltage_label.grid(row = 2, column = 2)
         self.current_label = tk.Label(self,text = "0.00")
-        self.current_label.pack()
-        self.set_current_label = tk.Label(self, text = "Running current = {}".format(self.config.Amp_set))
-        self.set_current_label.pack()
+        self.current_label.grid(row = 3, column = 2)
+        self.set_current_label = tk.Label(self, text = "Set current = {}".format(self.config.Amp_set))
+        self.set_current_label.grid(row = 0, column = 1)
         self.set_Q_label = tk.Label(self, text = "Q is set to {}".format(self.config.Q_set))
-        self.set_Q_label.pack()
+        self.set_Q_label.grid(row = 1, column = 1)
+
 
     def search_serial_ports(self):
         self.comport_list = [p.device for p in serial.tools.list_ports.comports()]
