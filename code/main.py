@@ -37,14 +37,12 @@ class Psu():
         print(result)
 
     def load_config(self):
-        f = open("config.txt","r")
-        config = f.read().splitlines()
-        self.Amp_set = float(config[0].split(":")[1])
-        self.Q_set = float(config[1].split(":")[1])
-        self.broker_address = config[2].split(":")[1]
-        self.mqtt_username = config[3].split(":")[1]
-        self.mqtt_password = config[4].split(":")[1]
-        f.close()
+        config = Config_handler()
+        self.Amp_set = config.Amp_set
+        self.Q_set = config.Q_set
+        self.broker_address = config.broker_address
+        self.mqtt_username = config.mqtt_username
+        self.mqtt_password = config.mqtt_password
 
     def serial_connection_stop(self):
         print("I am tryting to stop")
@@ -112,7 +110,7 @@ class Psu():
             self.message["amphour"] = self.Q_factor
             #self.client.publish("shinongmao@gmail.com/lab/pow","voltage:{},current:{},ampHour:{}".format(self.volt,self.curr,self.Q_factor))
             self.client.publish("shinongmao@gmail.com/lab/pow",json.dumps(self.message))
-            self.record_file.seek(0)
+            self.record_file.seek(0)  
             self.record_file.truncate()
             self.record_file.write(str(self.Q_factor))
             self.record_file.flush()
@@ -128,6 +126,7 @@ class App(tk.Frame):
         super().__init__(master)
         self.pack()
         self.search_serial_ports()
+        self.config = Config_handler()
         self.create_widgets()
         self.started = False
     
@@ -146,6 +145,10 @@ class App(tk.Frame):
         self.voltage_label.pack()
         self.current_label = tk.Label(self,text = "0.00")
         self.current_label.pack()
+        self.set_current_label = tk.Label(self, text = "Running current = {}".format(self.config.Amp_set))
+        self.set_current_label.pack()
+        self.set_Q_label = tk.Label(self, text = "Q is set to {}".format(self.config.Q_set))
+        self.set_Q_label.pack()
 
     def search_serial_ports(self):
         self.comport_list = [p.device for p in serial.tools.list_ports.comports()]
@@ -173,6 +176,17 @@ class App(tk.Frame):
         else:
             self.voltage_label["text"] = "OFF"
             self.current_label["text"] = "OFF"
+
+class Config_handler():
+    def __init__(self):
+        f = open("config.txt","r")
+        config = f.read().splitlines()
+        self.Amp_set = float(config[0].split(":")[1])
+        self.Q_set = float(config[1].split(":")[1])
+        self.broker_address = config[2].split(":")[1]
+        self.mqtt_username = config[3].split(":")[1]
+        self.mqtt_password = config[4].split(":")[1]
+        f.close()
 
 
 if __name__ == "__main__":
