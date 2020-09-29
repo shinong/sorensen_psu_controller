@@ -36,7 +36,7 @@ class Psu():
             self.sio.write(str("*IDN?\n"))
             result = self.sio.readline()
             print(result)
-        except serial.SerialException:
+        except IOError:
             print("Serial connection failed")
         
 
