@@ -28,13 +28,17 @@ class Psu():
             print("please define a serial port first")
 
     def serial_connection_start(self):
-        self.ser = serial.Serial(self.port, 9600, timeout= 1)
-        self.sio = io.TextIOWrapper(io.BufferedRWPair(self.ser, self.ser, 1), newline= "\r", line_buffering= True)
-        self.sio.write("*ADR 1\n")
-        time.sleep(0.1)
-        self.sio.write(str("*IDN?\n"))
-        result = self.sio.readline()
-        print(result)
+        try:
+            self.ser = serial.Serial(self.port, 9600, timeout= 1)
+            self.sio = io.TextIOWrapper(io.BufferedRWPair(self.ser, self.ser, 1), newline= "\r", line_buffering= True)
+            self.sio.write("*ADR 1\n")
+            time.sleep(0.1)
+            self.sio.write(str("*IDN?\n"))
+            result = self.sio.readline()
+            print(result)
+        except serial.SerialException:
+            print("Serial connection failed")
+        
 
     def load_config(self):
         config = Config_handler()
@@ -131,25 +135,42 @@ class App(tk.Frame):
         self.started = False
     
     def create_widgets(self):
-        #buttons
-        self.start_button = tk.Button(self, text= "Start", bg= "green", command= lambda:threading.Thread(target=self.start_command).start())
-        self.start_button.grid(row = 5, column = 2)
-        self.stop_button = tk.Button(self, text= "Force Stop", bg= "red", command= self.stop_command)
-        self.stop_button.grid(row = 6, column = 2)
-        #combobox
-        self.port_select = ttk.Combobox(self,values= self.comport_list)
-        self.port_select.current(0)
-        self.port_select.grid(row = 4, column = 2)
-        #labels
-        self.voltage_label = tk.Label(self,text = "0.00")
-        self.voltage_label.grid(row = 2, column = 2)
-        self.current_label = tk.Label(self,text = "0.00")
-        self.current_label.grid(row = 3, column = 2)
+        #right buttons
+        self.start_button_right = tk.Button(self, text= "Start", bg= "green", command= lambda:threading.Thread(target=self.start_command).start())
+        self.start_button_right.grid(row = 5, column = 2)
+        self.stop_button_right = tk.Button(self, text= "Force Stop", bg= "red", command= self.stop_command)
+        self.stop_button_right.grid(row = 6, column = 2)
+        #left buttons
+        self.start_button_left = tk.Button(self, text= "Start", bg= "grey")
+        self.start_button_left.grid(row=5, column= 0)
+        self.stop_button_left = tk.Button(self, text= "Force Stop", bg= "grey")
+        self.stop_button_left.grid(row= 6, column= 0)
+        #shared bottoms
+        self.port_refresh_button = tk.Button(self, text= "Refresh", bg = "yellow", command= self.search_serial_ports)
+        self.port_refresh_button.grid(row= 4, column= 1)
+        #right combobox
+        self.port_select_right = ttk.Combobox(self,values= self.comport_list)
+        self.port_select_right.current(0)
+        self.port_select_right.grid(row = 4, column = 2)
+        #left combobox
+        self.port_select_left = ttk.Combobox(self, values = self.comport_list)
+        self.port_select_left.current(1)
+        self.port_select_left.grid(row= 4, column= 0)
+        #shared labels
         self.set_current_label = tk.Label(self, text = "Set current = {}".format(self.config.Amp_set))
         self.set_current_label.grid(row = 0, column = 1)
         self.set_Q_label = tk.Label(self, text = "Q is set to {}".format(self.config.Q_set))
         self.set_Q_label.grid(row = 1, column = 1)
-
+        #left labels
+        self.current_label_left = tk.Label(self, text= "N/A")
+        self.current_label_left.grid(row=2, column= 0)
+        self.voltage_label_left = tk.Label(self, text= "N/A")
+        self.voltage_label_left.grid(row=3, column= 0)
+        #right labels
+        self.voltage_label_right = tk.Label(self,text = "0.00")
+        self.voltage_label_right.grid(row = 2, column = 2)
+        self.current_label_right = tk.Label(self,text = "0.00")
+        self.current_label_right.grid(row = 3, column = 2)
 
     def search_serial_ports(self):
         self.comport_list = [p.device for p in serial.tools.list_ports.comports()]
@@ -157,10 +178,10 @@ class App(tk.Frame):
 
     def start_command(self):
         if not self.started:
-            self.power_control = Psu(self.port_select.get())
+            self.power_control = Psu(self.port_select_right.get())
             self.power_control.running_status = True
             self.started = True
-            self.current_label.after(1000, self.update_label)
+            self.current_label_right.after(1000, self.update_label)
             self.power_control.running()
         else:
             print("already running")
@@ -171,12 +192,12 @@ class App(tk.Frame):
         
     def update_label(self):
         if self.started:
-            self.voltage_label["text"] = self.power_control.volt
-            self.current_label["text"] = self.power_control.curr
-            self.current_label.after(10000,self.update_label)
+            self.voltage_label_right["text"] = self.power_control.volt
+            self.current_label_right["text"] = self.power_control.curr
+            self.current_label_right.after(10000,self.update_label)
         else:
-            self.voltage_label["text"] = "OFF"
-            self.current_label["text"] = "OFF"
+            self.voltage_label_right["text"] = "OFF"
+            self.current_label_right["text"] = "OFF"
 
 class Config_handler():
     def __init__(self):
