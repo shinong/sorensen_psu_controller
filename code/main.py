@@ -147,7 +147,7 @@ class App(tk.Frame):
         self.stop_button_left = tk.Button(self, text= "Force Stop", bg= "grey")
         self.stop_button_left.grid(row= 6, column= 0)
         #shared bottoms
-        self.port_refresh_button = tk.Button(self, text= "Refresh", bg = "yellow", command= self.search_serial_ports)
+        self.port_refresh_button = tk.Button(self, text= "Refresh", bg = "yellow", command= self.update_serial_ports)
         self.port_refresh_button.grid(row= 4, column= 1)
         #right combobox
         self.port_select_right = ttk.Combobox(self,values= self.comport_list)
@@ -155,7 +155,7 @@ class App(tk.Frame):
         self.port_select_right.grid(row = 4, column = 2)
         #left combobox
         self.port_select_left = ttk.Combobox(self, values = self.comport_list)
-        self.port_select_left.current(1)
+        self.port_select_left.current(0)
         self.port_select_left.grid(row= 4, column= 0)
         #shared labels
         self.set_current_label = tk.Label(self, text = "Set current = {}".format(self.config.Amp_set))
@@ -176,6 +176,10 @@ class App(tk.Frame):
     def search_serial_ports(self):
         self.comport_list = [p.device for p in serial.tools.list_ports.comports()]
 
+    def update_serial_ports(self):
+        available_serial_ports = [p.device for p in serial.tools.list_ports.comports()]
+        self.port_select_left["values"] = available_serial_ports
+        self.port_select_right["values"] = available_serial_ports
 
     def start_command(self):
         if not self.started:
