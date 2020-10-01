@@ -56,6 +56,7 @@ class Psu():
         self.record_file.truncate()
         self.record_file.write("-1")
         self.record_file.close()
+        self.running_status = False
 
     def mqtt_config(self):
         self.client = mqtt.Client("pow_server")
@@ -195,6 +196,11 @@ class App(tk.Frame):
             self.voltage_label_right["text"] = self.power_control.volt
             self.current_label_right["text"] = self.power_control.curr
             self.current_label_right.after(10000,self.update_label)
+            try:
+                if not self.power_control.running_status:
+                    self.started = False
+            except NameError:
+                pass
         else:
             self.voltage_label_right["text"] = "OFF"
             self.current_label_right["text"] = "OFF"
