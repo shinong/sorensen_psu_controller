@@ -199,8 +199,10 @@ class App(tk.Frame):
             self.power_control.running_status = True
             self.started = True
             self.current_label_right.after(1000, self.update_label)
-            self.power_control.running()
             self.update_est_time_label()
+            #   power_control.running() func contains a while loop inside, any other starter code should be 
+            #   placed above this
+            self.power_control.running()
         else:
             print("already running")
 
@@ -231,8 +233,8 @@ class App(tk.Frame):
         return str(start_time + datetime.timedelta(hours = hours, minutes= minutes))
     
     def update_est_time_label(self):
-        #self.est_label_left["text"] = self.est_time_cal()
-        self.est_label_right["text"] = self.est_time_cal()
+        #self.est_time_left["text"] = self.est_time_cal()
+        self.est_time_right["text"] = self.est_time_cal()
         
 
 class Config_handler():
