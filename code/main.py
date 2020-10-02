@@ -1,3 +1,7 @@
+#from datetime import datetime
+import datetime
+from io import TextIOBase
+from os import terminal_size
 import serial
 import serial.tools.list_ports
 import io
@@ -167,11 +171,19 @@ class App(tk.Frame):
         self.current_label_left.grid(row=2, column= 0)
         self.voltage_label_left = tk.Label(self, text= "N/A")
         self.voltage_label_left.grid(row=3, column= 0)
+        self.est_label_left = tk.Label(self, text= "Estimated finished time:")
+        self.est_label_left.grid(row=7, column= 0)
+        self.est_time_left = ttk.Label(self, text= "N/A")
+        self.est_time_left.grid(row=8, column= 0)
         #right labels
         self.voltage_label_right = tk.Label(self,text = "0.00")
         self.voltage_label_right.grid(row = 2, column = 2)
         self.current_label_right = tk.Label(self,text = "0.00")
         self.current_label_right.grid(row = 3, column = 2)
+        self.est_label_right = tk.Label(self, text= "Estimated finished time:")
+        self.est_label_right.grid(row=7, column= 2)
+        self.est_time_right = tk.Label(self, text= "N/A")
+        self.est_time_right.grid(row=8, column= 2)
 
     def search_serial_ports(self):
         self.comport_list = [p.device for p in serial.tools.list_ports.comports()]
@@ -188,6 +200,7 @@ class App(tk.Frame):
             self.started = True
             self.current_label_right.after(1000, self.update_label)
             self.power_control.running()
+            self.update_est_time_label()
         else:
             print("already running")
 
@@ -208,6 +221,19 @@ class App(tk.Frame):
         else:
             self.voltage_label_right["text"] = "OFF"
             self.current_label_right["text"] = "OFF"
+    
+    def est_time_cal(self):
+        amp_hour = self.config.Q_set
+        amp = self.config.Amp_set
+        hours = int(amp_hour/amp)
+        minutes = (amp_hour%amp)/4.8*60
+        start_time = datetime.datetime.now()
+        return str(start_time + datetime.timedelta(hours = hours, minutes= minutes))
+    
+    def update_est_time_label(self):
+        #self.est_label_left["text"] = self.est_time_cal()
+        self.est_label_right["text"] = self.est_time_cal()
+        
 
 class Config_handler():
     def __init__(self):
