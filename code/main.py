@@ -114,8 +114,8 @@ class Psu():
             self.Q_factor += curr_num*(end-start)/3600
             print(self.Q_factor)
             start = time.time()
-            self.message["voltage"] = self.volt
-            self.message["current"] = self.curr
+            self.message["voltage"] = self.volt.replace("\r","")
+            self.message["current"] = self.curr.replace("\r","")
             self.message["amphour"] = self.Q_factor
             #self.client.publish("shinongmao@gmail.com/lab/pow","voltage:{},current:{},ampHour:{}".format(self.volt,self.curr,self.Q_factor))
             self.client.publish("shinongmao@gmail.com/lab/pow",json.dumps(self.message))
