@@ -161,11 +161,6 @@ class App(tk.Frame):
         self.port_select_left = ttk.Combobox(self, values = self.comport_list)
         self.port_select_left.current(0)
         self.port_select_left.grid(row= 4, column= 0)
-        #shared labels
-        self.set_current_label = tk.Label(self, text = "Set current = {}".format(self.config.Amp_set))
-        self.set_current_label.grid(row = 0, column = 1)
-        self.set_Q_label = tk.Label(self, text = "Q is set to {}".format(self.config.Q_set))
-        self.set_Q_label.grid(row = 1, column = 1)
         #left labels
         self.current_label_left = tk.Label(self, text= "N/A")
         self.current_label_left.grid(row=2, column= 0)
@@ -175,6 +170,10 @@ class App(tk.Frame):
         self.est_label_left.grid(row=7, column= 0)
         self.est_time_left = ttk.Label(self, text= "N/A")
         self.est_time_left.grid(row=8, column= 0)
+        self.set_current_label_left = tk.Label(self, text = "Set current left {}".format(self.config.Amp_set))
+        self.set_current_label_left.grid(row = 0, column = 0)
+        self.set_Q_label_left = tk.Label(self, text = "Q left is set to {}".format(self.config.Q_set))
+        self.set_Q_label_left.grid(row = 1, column = 0)
         #right labels
         self.voltage_label_right = tk.Label(self,text = "0.00")
         self.voltage_label_right.grid(row = 2, column = 2)
@@ -184,6 +183,10 @@ class App(tk.Frame):
         self.est_label_right.grid(row=7, column= 2)
         self.est_time_right = tk.Label(self, text= "N/A")
         self.est_time_right.grid(row=8, column= 2)
+        self.set_current_label_right = tk.Label(self, text = "Set current right {}".format(self.config.Amp_set))
+        self.set_current_label_right.grid(row = 0, column = 2)
+        self.set_Q_label_right = tk.Label(self, text = "Q right is set to {}".format(self.config.Q_set))
+        self.set_Q_label_right.grid(row = 1, column = 2)
 
     def search_serial_ports(self):
         self.comport_list = [p.device for p in serial.tools.list_ports.comports()]
