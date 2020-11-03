@@ -19,6 +19,7 @@ class Psu():
         if port:
             print("the port is" + port)
             self.port = port
+            self.left = left
             self.status_log_check()
             self.load_config(left)
             self.serial_connection_start()
@@ -81,7 +82,10 @@ class Psu():
         print("log: ", buf)
 
     def status_log_check(self):
-        temp_file = open("record.txt", "r")
+        if self.left:
+            temp_file = open("record_left.txt", "r")
+        else:
+            temp_file = open("record_right.txt", "r")
         previous_Q = float(temp_file.read())
         if previous_Q < 0:
             print("fresh start mode")
@@ -101,7 +105,10 @@ class Psu():
         self.sio.write(":SOUR:CURR {}\n".format(self.Amp_set))
         time.sleep(0.1)
         self.sio.write(":OUTP:STAT ON\n")
-        self.record_file = open("record.txt","w")
+        if self.left:
+            self.record_file = open("record_left.txt","w")
+        else:
+            self.record_file = open("record_right.txt","w")
         start = time.time()
         while (True):
             self.curr = self.data_fetch(":MEAS:CURR?\n")
