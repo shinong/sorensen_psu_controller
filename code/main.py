@@ -48,11 +48,11 @@ class Psu():
     def load_config(self, left):
         config = Config_handler()
         if left:
-            self.Amp_set = config.Amp_set
-            self.Q_set = config.Q_set
-        else:
             self.Amp_set = config.Amp_set_left
             self.Q_set = config.Q_set_left
+        else:
+            self.Amp_set = config.Amp_set
+            self.Q_set = config.Q_set
         self.broker_address = config.broker_address
         self.mqtt_username = config.mqtt_username
         self.mqtt_password = config.mqtt_password
@@ -227,7 +227,7 @@ class App(tk.Frame):
 
     def start_command_left(self):
         if not self.started_left:
-            self.power_control_left = Psu(self.port_select_right.get(), left= True)
+            self.power_control_left = Psu(self.port_select_left.get(), left= True)
             self.power_control_left.running_status = True
             self.started_left = True
             self.current_label_left.after(1000, self.update_label_left)
