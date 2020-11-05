@@ -28,7 +28,7 @@ class Psu():
             self.running_status = False
             self.curr = "0.00"
             self.volt = "0.00"
-            self.message = {"current":0, "voltage":0, "amphour":0}
+            self.message = {"psu": "left" if left else "right","current":0, "voltage":0, "amphour":0}
         else:
             print("please define a serial port first")
 
