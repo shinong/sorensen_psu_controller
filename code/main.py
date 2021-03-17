@@ -153,18 +153,20 @@ class App(tk.Frame):
     
     def create_widgets(self):
         #right buttons
-        self.start_button_right = tk.Button(self, text= "Start", bg= "green", command= lambda:threading.Thread(target=self.start_command_right).start())
+        self.start_button_right = tk.Button(self, text= "Start Run", bg= "green", command= lambda:threading.Thread(target=self.start_command_right).start())
         self.start_button_right.grid(row = 5, column = 2)
+        self.start_button_right.config(height=3,width=10)
         self.stop_button_right = tk.Button(self, text= "Force Stop", bg= "red", command= self.stop_command_right)
-        self.stop_button_right.grid(row = 6, column = 2)
+        self.stop_button_right.grid(row = 6, column = 2,pady=8)
         #left buttons
-        self.start_button_left = tk.Button(self, text= "Start", bg= "green", command= lambda:threading.Thread(target=self.start_command_left).start())
+        self.start_button_left = tk.Button(self, text= "Start Run", bg= "green", command= lambda:threading.Thread(target=self.start_command_left).start())
         self.start_button_left.grid(row=5, column= 0)
+        self.start_button_left.config(height=3,width=10)
         self.stop_button_left = tk.Button(self, text= "Force Stop", bg= "red", command= self.stop_command_left)
         self.stop_button_left.grid(row= 6, column= 0)
         #shared bottoms
         self.port_refresh_button = tk.Button(self, text= "Refresh", bg = "yellow", command= self.update_serial_ports)
-        self.port_refresh_button.grid(row= 4, column= 1)
+        self.port_refresh_button.grid(row= 4, column= 1,padx=5,pady=8)
         #right combobox
         self.port_select_right = ttk.Combobox(self,values= self.comport_list)
         self.port_select_right.current(0)
@@ -172,7 +174,7 @@ class App(tk.Frame):
         #left combobox
         self.port_select_left = ttk.Combobox(self, values = self.comport_list)
         self.port_select_left.current(0)
-        self.port_select_left.grid(row= 4, column= 0)
+        self.port_select_left.grid(row= 4, column= 0,padx=5)
         #left labels
         self.current_label_left = tk.Label(self, text= "N/A")
         self.current_label_left.grid(row=2, column= 0)
